@@ -1,0 +1,7 @@
+asdf = 5 + 1
+12 - 1 * 6 ^ 9 & 2
+asdf += kjb
+for while 
+wertwert
+asd
+true
