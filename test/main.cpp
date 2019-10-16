@@ -1,6 +1,10 @@
 #include <iostream>
 
 #include "Lexer.hpp"
+#include "PrintVisitor.hpp"
+#include "Parser.hpp"
+
+using namespace Compiler;
 
 int main( int argc, char** argv ){
 	if( argc < 2 ){
@@ -10,6 +14,7 @@ int main( int argc, char** argv ){
 
 	Compiler::Tokenizer tokenizer{ std::ifstream( argv[1] )};
 
+#if 0
 	for( Compiler::ParsedToken temp = tokenizer.next_tok(); temp.token != Compiler::tok_eof; temp = tokenizer.next_tok() ){
 		switch( temp.token ){
 			case Compiler::tok_num_lit:
@@ -24,4 +29,15 @@ int main( int argc, char** argv ){
 				break;
 		}
 	}
+#else
+
+	std::cout << std::endl << std::endl;
+
+	Parser pars( std::move( tokenizer ));
+
+	auto ast = pars();
+
+	AST::PrintVisitor pv( std::cout );
+	ast->accept( pv );
+#endif
 }

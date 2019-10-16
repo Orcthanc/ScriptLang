@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <memory>
 
@@ -10,6 +12,9 @@ namespace Compiler {
 	TOKEN( tok_num_lit )					/* number literal */		\
 	TOKEN( tok_str_lit )					/* string literal */		\
 	TOKEN( tok_id )							/* identifier */			\
+	TOKEN( tok_asg )						/* = */						\
+	TOKEN( tok_semicolon )					/* ; */						\
+	TOKEN( tok_comma )						/* , */						\
 																		\
 	/* Math */															\
 	/* Arithmetic */													\
@@ -73,6 +78,6 @@ namespace Compiler {
 		ParsedToken( Token tok ): token( tok ), metadata( nullptr ){}
 
 		Token token;
-		std::unique_ptr<Metadata> metadata;
+		std::shared_ptr<Metadata> metadata;
 	};
 }

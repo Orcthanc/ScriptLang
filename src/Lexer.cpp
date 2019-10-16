@@ -2,11 +2,32 @@
 
 #include <string.h>
 
+#include <iostream>
+
 using namespace Compiler;
 
-Tokenizer::Tokenizer( std::ifstream&& file ): file( std::move( file )){
+Tokenizer::Tokenizer( std::ifstream&& file ): current_tok( tok_error ), future_tok( tok_error ), file( std::move( file )){
 	history = (char*)malloc( 16 );
 	hist_len = 16;
+	do {
+		read = this->file.get();
+	} while( isspace( read ));
+	calc_next_tok();
+}
+
+Tokenizer::Tokenizer( Tokenizer&& tok ): current_tok( std::move( tok.current_tok )), future_tok( std::move( tok.future_tok )), file( std::move( tok.file )), history( std::move( tok.history )), hist_len( std::move( tok.hist_len )), read( tok.read ){
+	tok.history = nullptr;
+}
+
+Tokenizer& Tokenizer::operator=( Tokenizer&& tok ){
+	current_tok = std::move( tok.current_tok );
+	future_tok = std::move( tok.future_tok );
+	file = std::move( tok.file );
+	history = tok.history;
+	tok.history = nullptr;
+	hist_len = tok.hist_len;
+	read = tok.read;
+	return *this;
 }
 
 Tokenizer::~Tokenizer(){
@@ -14,70 +35,116 @@ Tokenizer::~Tokenizer(){
 }
 
 ParsedToken Tokenizer::next_tok(){
-	read = file.get();
+	calc_next_tok();
+	return current_tok;
+}
+
+ParsedToken Tokenizer::peek_tok(){
+	return future_tok;
+}
+
+ParsedToken Tokenizer::curr_tok(){
+	return current_tok;
+}
+
+void Tokenizer::calc_next_tok(){
+	if( future_tok.token == tok_eof ){
+		current_tok = tok_eof;
+		return;
+	}
 
 	while( isspace( read ))
 		read = file.get();
 
+	current_tok = std::move( future_tok );
+
 	switch( read ){
 		case EOF:
-			return { tok_eof, nullptr };
+			future_tok = { tok_eof, nullptr };
+			break;
 		case '+':
 			if( file.peek() == '=' ){
 				file.get();
-				return tok_asg_add;
+				future_tok = tok_asg_add;
+				break;
 			}
-			return tok_add;
+			future_tok = tok_add;
+			break;
 		case '-':
 			if( file.peek() == '=' ){
 				file.get();
-				return tok_asg_sub;
+				future_tok = tok_asg_sub;
+				break;
 			}
-			return tok_sub;
+			future_tok = tok_sub;
+			break;
 		case '*':
 			if( file.peek() == '=' ){
 				file.get();
-				return tok_asg_mul;
+				future_tok = tok_asg_mul;
+			break;
 			}
-			return tok_mul;
+			future_tok = tok_mul;
+			break;
 		case '/':
 			if( file.peek() == '=' ){
 				file.get();
-				return tok_asg_div;
+				future_tok = tok_asg_div;
+			break;
 			}
-			return tok_div;
+			future_tok = tok_div;
+			break;
 		case '&':
 			if( file.peek() == '=' ){
 				file.get();
-				return tok_asg_and;
+				future_tok = tok_asg_and;
+			break;
 			}
-			return tok_and;
+			future_tok = tok_and;
+			break;
 		case '^':
 			if( file.peek() == '=' ){
 				file.get();
-				return tok_asg_xor;
+				future_tok = tok_asg_xor;
+			break;
 			}
-			return tok_xor;
+			future_tok = tok_xor;
+			break;
 		case '|':
 			if( file.peek() == '=' ){
 				file.get();
-				return tok_asg_ior;
+				future_tok = tok_asg_ior;
+			break;
 			}
-			return tok_ior;
+			future_tok = tok_ior;
+			break;
+		case '=':
+			future_tok = tok_asg;
+			break;
 		case '(':
-			return tok_brak_round_open;
+			future_tok = tok_brak_round_open;
+			break;
 		case ')':
-			return tok_brak_round_close;
+			future_tok = tok_brak_round_close;
+			break;
 		case '[':
-			return tok_brak_square_open;
+			future_tok = tok_brak_square_open;
+			break;
 		case ']':
-			return tok_brak_square_close;
+			future_tok = tok_brak_square_close;
+			break;
 		case '{':
-			return tok_brak_curly_open;
+			future_tok = tok_brak_curly_open;
+			break;
 		case '}':
-			return tok_brak_curly_close;
+			future_tok = tok_brak_curly_close;
+			break;
+		case ';':
+			future_tok = tok_semicolon;
+			break;
 		case '"':
 		{
+			read = file.get();
 			unsigned i = 0;
 			do {
 				if( i >= hist_len ){
@@ -90,10 +157,13 @@ ParsedToken Tokenizer::next_tok(){
 				history[i++] = read;
 				read = file.get();
 				//TODO \"
+				if( read == EOF )
+					std::cout << "Missing \"" << std::endl;
 			} while( read != '"' );
 			history[i] = '\0';
 
-			return { tok_str_lit, std::unique_ptr<Metadata>( new MetadataString( history ))};
+			future_tok = { tok_str_lit, std::unique_ptr<Metadata>( new MetadataString( history ))};
+			break;
 
 		}
 		default:
@@ -112,7 +182,8 @@ ParsedToken Tokenizer::next_tok(){
 				} while( isdigit( read ) || read == '.' );
 				history[i] = '\0';
 				double val = strtod( history, nullptr );
-				return { tok_num_lit, std::unique_ptr<Metadata>( new MetadataNum( val ))};
+				future_tok = { tok_num_lit, std::unique_ptr<Metadata>( new MetadataNum( val ))};
+				return;
 			}
 			else if( isalpha( read )){
 				unsigned i = 0;
@@ -129,7 +200,7 @@ ParsedToken Tokenizer::next_tok(){
 				} while( isalnum( read ));
 				history[i] = '\0';
 
-#define KEYWORD( k ) if( !strcmp( history, #k )) return { tok_##k, nullptr };
+#define KEYWORD( k ) if( !strcmp( history, #k )) { future_tok = { tok_##k, nullptr }; return; }
 				KEYWORD( true )
 				KEYWORD( false )
 				KEYWORD( for )
@@ -137,8 +208,14 @@ ParsedToken Tokenizer::next_tok(){
 				KEYWORD( null )
 #undef KEYWORD
 
-				return { tok_id, std::unique_ptr<Metadata>( new MetadataString( history ))};
+				future_tok = { tok_id, std::unique_ptr<Metadata>( new MetadataString( history ))};
+				return;
 			}
-			return tok_error;
+			future_tok = tok_error;
+			break;
 	}
+	read = file.get();
+	
+	while( isspace( read ))
+		read = file.get();
 }
