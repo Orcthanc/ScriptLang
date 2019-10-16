@@ -15,7 +15,8 @@ namespace Compiler {
 	TOKEN( tok_asg )						/* = */						\
 	TOKEN( tok_semicolon )					/* ; */						\
 	TOKEN( tok_comma )						/* , */						\
-																		\
+	TOKEN( tok_scope_res )					/* :: */					\
+	/* TODO ~ . % << >> %= */												\
 	/* Math */															\
 	/* Arithmetic */													\
 	TOKEN( tok_add )						/* + */						\
@@ -34,6 +35,9 @@ namespace Compiler {
 	TOKEN( tok_asg_and )					/* &= */					\
 	TOKEN( tok_asg_xor )					/* ^= */					\
 	TOKEN( tok_asg_ior )					/* |= */					\
+	/* Shortcut */														\
+	TOKEN( tok_increment )					/* ++ */					\
+	TOKEN( tok_decrement )					/* -- */					\
 																		\
 	/* Brackets */														\
 	TOKEN( tok_brak_round_open )			/* ( */						\
