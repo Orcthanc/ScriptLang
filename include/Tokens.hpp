@@ -16,14 +16,17 @@ namespace Compiler {
 	TOKEN( tok_semicolon )					/* ; */						\
 	TOKEN( tok_comma )						/* , */						\
 	TOKEN( tok_scope_res )					/* :: */					\
-	/* TODO ~ . % << >> %= */												\
+	TOKEN( tok_dot )						/* . */						\
+	/* TODO Lexer.cpp != */												\
 	/* Math */															\
 	/* Arithmetic */													\
 	TOKEN( tok_add )						/* + */						\
 	TOKEN( tok_sub )						/* - */						\
 	TOKEN( tok_mul )						/* * */						\
 	TOKEN( tok_div )						/* / */						\
+	TOKEN( tok_mod )						/* % */						\
 	/* Bitwise */														\
+	TOKEN( tok_not )						/* ~ */						\
 	TOKEN( tok_and )						/* & */						\
 	TOKEN( tok_xor )						/* ^ */						\
 	TOKEN( tok_ior )						/* | */						\
@@ -32,12 +35,24 @@ namespace Compiler {
 	TOKEN( tok_asg_sub )					/* -= */					\
 	TOKEN( tok_asg_mul )					/* *= */					\
 	TOKEN( tok_asg_div )					/* /= */					\
+	TOKEN( tok_asg_mod )					/* %= */					\
 	TOKEN( tok_asg_and )					/* &= */					\
 	TOKEN( tok_asg_xor )					/* ^= */					\
 	TOKEN( tok_asg_ior )					/* |= */					\
 	/* Shortcut */														\
 	TOKEN( tok_increment )					/* ++ */					\
 	TOKEN( tok_decrement )					/* -- */					\
+	TOKEN( tok_left_shift )					/* << */					\
+	TOKEN( tok_right_shift )				/* >> */					\
+																		\
+	/* Logic */															\
+	TOKEN( tok_eq )							/* == */					\
+	TOKEN( tok_ne )							/* != */					\
+	TOKEN( tok_gt )							/* > */						\
+	TOKEN( tok_ge )							/* >= */					\
+	TOKEN( tok_lt )							/* < */						\
+	TOKEN( tok_le )							/* <= */					\
+	TOKEN( tok_logic_not )					/* ! */						\
 																		\
 	/* Brackets */														\
 	TOKEN( tok_brak_round_open )			/* ( */						\

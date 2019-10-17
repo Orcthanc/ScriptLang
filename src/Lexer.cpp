@@ -82,7 +82,7 @@ void Tokenizer::calc_next_tok(){
 			if( file.peek() == '=' ){
 				file.get();
 				future_tok = tok_asg_mul;
-			break;
+				break;
 			}
 			future_tok = tok_mul;
 			break;
@@ -90,15 +90,23 @@ void Tokenizer::calc_next_tok(){
 			if( file.peek() == '=' ){
 				file.get();
 				future_tok = tok_asg_div;
-			break;
+				break;
 			}
 			future_tok = tok_div;
+			break;
+		case '%':
+			if( file.peek() == '=' ){
+				file.get();
+				future_tok = tok_asg_mod;
+				break;
+			}
+			future_tok = tok_mod;
 			break;
 		case '&':
 			if( file.peek() == '=' ){
 				file.get();
 				future_tok = tok_asg_and;
-			break;
+				break;
 			}
 			future_tok = tok_and;
 			break;
@@ -106,7 +114,7 @@ void Tokenizer::calc_next_tok(){
 			if( file.peek() == '=' ){
 				file.get();
 				future_tok = tok_asg_xor;
-			break;
+				break;
 			}
 			future_tok = tok_xor;
 			break;
@@ -114,11 +122,27 @@ void Tokenizer::calc_next_tok(){
 			if( file.peek() == '=' ){
 				file.get();
 				future_tok = tok_asg_ior;
-			break;
+				break;
 			}
 			future_tok = tok_ior;
 			break;
+		case '~':
+			future_tok = tok_not;
+			break;
+		case '!':
+			if( file.peek() == '=' ){
+				file.get();
+				future_tok = tok_ne;
+				break;
+			}
+			future_tok = tok_logic_not;
+			break;
 		case '=':
+			if( file.peek() == '=' ){
+				file.get();
+				future_tok = tok_eq;
+				break;
+			}
 			future_tok = tok_asg;
 			break;
 		case '(':
@@ -141,6 +165,33 @@ void Tokenizer::calc_next_tok(){
 			break;
 		case ';':
 			future_tok = tok_semicolon;
+			break;
+		case '.':
+			future_tok = tok_dot;
+			break;
+		case '<':
+			if( file.peek() == '<' ){
+				file.get();
+				future_tok = tok_left_shift;
+				break;
+			} else if( file.peek() == '=' ){
+				file.get();
+				future_tok = tok_le;
+				break;
+			}
+			future_tok = tok_lt;
+			break;
+		case '>':
+			if( file.peek() == '>' ){
+				file.get();
+				future_tok = tok_right_shift;
+				break;
+			} else if( file.peek() == '=' ){
+				file.get();
+				future_tok = tok_ge;
+				break;
+			}
+			future_tok = tok_gt;
 			break;
 		case '"':
 		{
