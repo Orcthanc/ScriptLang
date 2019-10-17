@@ -67,6 +67,10 @@ void Tokenizer::calc_next_tok(){
 				file.get();
 				future_tok = tok_asg_add;
 				break;
+			} else if( file.peek() == '+' ){
+				file.get();
+				future_tok = tok_inc;
+				break;
 			}
 			future_tok = tok_add;
 			break;
@@ -74,6 +78,10 @@ void Tokenizer::calc_next_tok(){
 			if( file.peek() == '=' ){
 				file.get();
 				future_tok = tok_asg_sub;
+				break;
+			} else if( file.peek() == '-' ){
+				file.get();
+				future_tok = tok_dec;
 				break;
 			}
 			future_tok = tok_sub;
@@ -266,7 +274,7 @@ void Tokenizer::calc_next_tok(){
 			break;
 	}
 	read = file.get();
-	
+
 	while( isspace( read ))
 		read = file.get();
 }

@@ -3,6 +3,8 @@
 #include <string>
 #include <memory>
 
+#include "Operator.hpp"
+
 namespace Compiler {
 
 #define TOKENS 															\
@@ -17,7 +19,7 @@ namespace Compiler {
 	TOKEN( tok_comma )						/* , */						\
 	TOKEN( tok_scope_res )					/* :: */					\
 	TOKEN( tok_dot )						/* . */						\
-	/* TODO Lexer.cpp != */												\
+																		\
 	/* Math */															\
 	/* Arithmetic */													\
 	TOKEN( tok_add )						/* + */						\
@@ -40,8 +42,8 @@ namespace Compiler {
 	TOKEN( tok_asg_xor )					/* ^= */					\
 	TOKEN( tok_asg_ior )					/* |= */					\
 	/* Shortcut */														\
-	TOKEN( tok_increment )					/* ++ */					\
-	TOKEN( tok_decrement )					/* -- */					\
+	TOKEN( tok_inc )						/* ++ */					\
+	TOKEN( tok_dec )						/* -- */					\
 	TOKEN( tok_left_shift )					/* << */					\
 	TOKEN( tok_right_shift )				/* >> */					\
 																		\
@@ -77,6 +79,10 @@ namespace Compiler {
 #undef TOKEN
 
 	extern const char* tok_to_string( Token t );
+	//lhs and rhs indicate if there are expressions to the left/right of the op, or if the operator is unary
+	//tok_add, true, true -> op_add
+	//tok_add, false, true -> op_plus
+	extern const Operator tok_to_op( Token t, bool lhs, bool rhs );
 
 	struct Metadata{};
 
