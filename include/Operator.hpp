@@ -25,8 +25,8 @@ namespace Compiler {
 	OPERATOR( op_add )						/* + */		\
 	OPERATOR( op_sub )						/* - */		\
 														\
-	OPERATOR( op_shift_left )				/* << */	\
-	OPERATOR( op_shift_right )				/* >> */	\
+	OPERATOR( op_left_shift )				/* << */	\
+	OPERATOR( op_right_shift )				/* >> */	\
 														\
 	OPERATOR( op_lt )						/* < */		\
 	OPERATOR( op_le )						/* <= */	\

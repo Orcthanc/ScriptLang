@@ -37,8 +37,8 @@ size_t Compiler::precedence( Operator o ){
 		case op_add:
 		case op_sub:
 			return 4;
-		case op_shift_left:
-		case op_shift_right:
+		case op_left_shift:
+		case op_right_shift:
 			return 5;
 		case op_lt:
 		case op_le:
@@ -64,9 +64,11 @@ size_t Compiler::precedence( Operator o ){
 		case op_asg_xor:
 		case op_asg_ior:
 			return 11;
-		default:
+		case op_error:
 			return -1;
+			//No default to get warnings if a op gets added
 	}
+	return -1;
 }
 
 bool Compiler::left_to_right( Operator o ){
@@ -82,8 +84,8 @@ bool Compiler::left_to_right( Operator o ){
 		case op_mod:
 		case op_add:
 		case op_sub:
-		case op_shift_left:
-		case op_shift_right:
+		case op_left_shift:
+		case op_right_shift:
 		case op_lt:
 		case op_le:
 		case op_gt:
