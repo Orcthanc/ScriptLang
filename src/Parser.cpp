@@ -12,12 +12,12 @@ static bool check( const ParsedToken& tok, Token against ) noexcept{
 }
 
 std::unique_ptr<Node> Parser::operator()(){
-	return { std::unique_ptr<Node>( parseFunction() )};
+	return { std::unique_ptr<Node>( parseFunc() )};
 }
 
-Function* Parser::parseFunction() noexcept{
+Function* Parser::parseFunc() noexcept{
 	//TODO func tok_id( parameters )
-	
+
 	Function* node = new Function;
 	// {
 	if( !check( tokenizer.next_tok(), tok_brak_curly_open )){
@@ -26,7 +26,7 @@ Function* Parser::parseFunction() noexcept{
 	}
 
 	while( !check( tokenizer.next_tok(), tok_brak_curly_close )){
-		Stmt* stmt = parseStatement();
+		Stmt* stmt = parseStmt();
 		if( stmt == nullptr ){
 			std::cout << "Unexpected token \"" << tok_to_string( tokenizer.curr_tok().token ) << "\"" << std::endl;
 			return nullptr;
@@ -37,8 +37,8 @@ Function* Parser::parseFunction() noexcept{
 	return node;
 }
 
-Stmt* Parser::parseStatement() noexcept {
-	auto tmp = parseBinopExpr();
+Stmt* Parser::parseStmt() noexcept {
+	auto tmp = parseExpr();
 	if( check( tokenizer.curr_tok(), tok_semicolon ))
 		return new StmtExprSemicolon{ std::unique_ptr<Expr>( tmp )};
 	else {
@@ -47,7 +47,7 @@ Stmt* Parser::parseStatement() noexcept {
 	}
 }
 
-Expr* Parser::parseBinopExpr() noexcept {
+Expr* Parser::parseExpr() noexcept {
 	Expr* ret;
 	ParsedToken tok = tokenizer.curr_tok();
 
@@ -71,7 +71,7 @@ Expr* Parser::parseBinopExpr() noexcept {
 			break;
 		case tok_brak_round_open:
 			tokenizer.next_tok();
-			ret = parseBinopExpr();
+			ret = parseExpr();
 			if( !check( tokenizer.curr_tok(), tok_brak_round_close )){
 				std::cout << "Unexpected token \"" << tok_to_string( tokenizer.curr_tok().token ) << "\" expected \")\"" << std::endl;
 			}
@@ -92,58 +92,6 @@ Expr* Parser::parseBinopExpr() noexcept {
 	return ret;
 }
 
-Expr* Parser::parseExpression() noexcept {
-#if 0
-	Expr* ret;
-	//TODO Replace with curr_tok
-	auto tok = tokenizer.peek_tok();
-
-	std::cout << tok_to_string( tok.token ) << std::endl;
-	switch( tok.token ){
-		case tok_brak_round_open:
-			tokenizer.next_tok();
-			ret = parseExpression();
-			if( tokenizer.peek_tok().token != tok_brak_round_close ){
-				std::cout << "Unexpected token \"" << tok_to_string( tokenizer.peek_tok().token ) << "\" expected \")\"" << std::endl;
-			} else
-				tokenizer.next_tok();
-			break;
-		case tok_str_lit:
-			ret = new String( std::static_pointer_cast<MetadataString>( tok.metadata )->string );
-			tokenizer.next_tok();
-			break;
-		case tok_id:
-			ret = new Identifier( std::static_pointer_cast<MetadataString>( tok.metadata )->string );
-			tokenizer.next_tok();
-			break;
-		case tok_num_lit:
-			ret = new Number( std::static_pointer_cast<MetadataNum>( tok.metadata )->number );
-			tokenizer.next_tok();
-			break;
-		case tok_true:
-			ret = new Boolean( true );
-			tokenizer.next_tok();
-			break;
-		case tok_false:
-			ret = new Boolean( false );
-			tokenizer.next_tok();
-			break;
-		default:
-			{
-				if( tok_to_op( tok.token, false ) != op_error ){
-					//TODO complete and move to parseBinopExpr
-					std::cout << "Found unop (unimplemented)" << std::endl;
-					tokenizer.next_tok();
-					return parseExpression();
-				}
-				return nullptr;
-			}
-	}
-	return ret;
-#endif
-	return nullptr;
-}
-
 Expr* Parser::parseOp( Expr* lhs ) noexcept {
 	//TODO
 	std::cout << op_to_string( tok_to_op( tokenizer.curr_tok().token, true )) << std::endl;
@@ -155,11 +103,11 @@ Expr* Parser::parseOp( Expr* lhs ) noexcept {
 	}
 	tokenizer.next_tok();
 	delete lhs;
-	return parseBinopExpr();
+	return parseExpr();
 }
 
 Expr* Parser::parsePreUnop() noexcept {
 	//TODO
 	tokenizer.next_tok();
-	return parseBinopExpr();
+	return parseExpr();
 }

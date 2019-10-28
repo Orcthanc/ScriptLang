@@ -41,10 +41,9 @@ namespace Compiler {
 			//AST::Node parseFileStart();
 			//AST::Node parseNameSpace();
 			//TODO
-			AST::Function* parseFunction() noexcept;
-			AST::Stmt* parseStatement() noexcept;
-			AST::Expr* parseBinopExpr() noexcept;
-			AST::Expr* parseExpression() noexcept;
+			AST::Function* parseFunc() noexcept;
+			AST::Stmt* parseStmt() noexcept;
+			AST::Expr* parseExpr() noexcept;
 			AST::Expr* parseOp( AST::Expr* lhs ) noexcept;
 			AST::Expr* parsePreUnop() noexcept;
 	};
