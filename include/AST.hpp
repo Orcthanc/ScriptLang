@@ -5,6 +5,15 @@
 
 namespace AST {
 
+#define UNOPS										\
+	UNOP( PostInc );								\
+	UNOP( PostDec );								\
+	UNOP( PreInc );									\
+	UNOP( PreDec );									\
+	UNOP( Plus );									\
+	UNOP( Minus );									\
+	UNOP( Not );
+
 	struct Visitor;
 
 	struct Node {
@@ -124,6 +133,24 @@ namespace AST {
 		virtual void accept( Visitor& v );
 	};
 
+
+	struct Unop: public Expr {
+		virtual ~Unop() = default;
+		virtual void accept( Visitor& v ) = 0;
+
+		std::unique_ptr<Node> val;
+	};
+
+
+#define UNOP( name )								\
+	struct name: public Unop {						\
+		virtual ~name() = default;					\
+		virtual void accept( Visitor& v );			\
+	};
+	UNOPS
+#undef UNOP
+
+
 	struct Stmt: public Node {
 		virtual ~Stmt() = default;
 		virtual void accept( Visitor& v ) = 0;
@@ -146,7 +173,11 @@ namespace AST {
 	};
 
 	struct Visitor {
+#define UNOP( name )					\
+		ELEMENT( name )
+
 #define ELEMENTS						\
+		UNOPS							\
 		ELEMENT( Node )					\
 		ELEMENT( OpExpr )				\
 		ELEMENT( Expr )					\

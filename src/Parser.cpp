@@ -7,7 +7,7 @@
 using namespace Compiler;
 using namespace AST;
 
-static bool check( const ParsedToken& tok, Token against ) noexcept{
+static bool check( const ParsedToken& tok, Token against ){
 	return tok.token == against;
 }
 
@@ -15,7 +15,7 @@ std::unique_ptr<Node> Parser::operator()(){
 	return { std::unique_ptr<Node>( parseFunc() )};
 }
 
-Function* Parser::parseFunc() noexcept{
+Function* Parser::parseFunc(){
 	//TODO func tok_id( parameters )
 
 	Function* node = new Function;
@@ -37,7 +37,7 @@ Function* Parser::parseFunc() noexcept{
 	return node;
 }
 
-Stmt* Parser::parseStmt() noexcept {
+Stmt* Parser::parseStmt() {
 	auto tmp = parseExpr();
 	if( check( tokenizer.curr_tok(), tok_semicolon ))
 		return new StmtExprSemicolon{ std::unique_ptr<Expr>( tmp )};
@@ -47,7 +47,7 @@ Stmt* Parser::parseStmt() noexcept {
 	}
 }
 
-Expr* Parser::parseExpr() noexcept {
+Expr* Parser::parseExpr() {
 	Expr* ret;
 	ParsedToken tok = tokenizer.curr_tok();
 
@@ -92,7 +92,7 @@ Expr* Parser::parseExpr() noexcept {
 	return ret;
 }
 
-Expr* Parser::parseOp( Expr* lhs ) noexcept {
+Expr* Parser::parseOp( Expr* lhs ) {
 	//TODO
 	std::cout << op_to_string( tok_to_op( tokenizer.curr_tok().token, true )) << std::endl;
 	if( unop( tok_to_op( tokenizer.curr_tok().token, true ))){
@@ -106,8 +106,17 @@ Expr* Parser::parseOp( Expr* lhs ) noexcept {
 	return parseExpr();
 }
 
-Expr* Parser::parsePreUnop() noexcept {
+Expr* Parser::parsePreUnop() {
 	//TODO
-	tokenizer.next_tok();
+	//tokenizer.next_tok();
+	switch( tok_to_op( tokenizer.curr_tok().token, false )){
+		case op_pre_inc:
+		case op_pre_dec:
+		case op_plus:
+		case op_minus:
+		case op_not:
+		default:
+			std::cout << "Invalid op \"" << tok_to_op( tokenizer.curr_tok().token, false ) << "\"";
+	}
 	return parseExpr();
 }

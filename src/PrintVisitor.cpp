@@ -9,6 +9,35 @@ static inline void ident( size_t amount, std::ostream& os ){
 		os << "\t";
 }
 
+void PrintVisitor::visit( PostInc* elem ){
+	elem->val->accept( *this );
+	out << "++";
+}
+void PrintVisitor::visit( PostDec* elem ){
+	elem->val->accept( *this );
+	out << "--";
+}
+void PrintVisitor::visit( PreInc* elem ){
+	out << "++";
+	elem->val->accept( *this );
+}
+void PrintVisitor::visit( PreDec* elem ){
+	out << "--";
+	elem->val->accept( *this );
+}
+void PrintVisitor::visit( Plus* elem ){
+	out << "+";
+	elem->val->accept( *this );
+}
+void PrintVisitor::visit( Minus* elem ){
+	out << "-";
+	elem->val->accept( *this );
+}
+void PrintVisitor::visit( Not* elem ){
+	out << "~";
+	elem->val->accept( *this );
+}
+
 void PrintVisitor::visit( Node* elem ){
 	throw std::runtime_error( "Unexcpected class in syntax tree" );
 }
