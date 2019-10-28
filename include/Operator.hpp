@@ -59,4 +59,5 @@ namespace Compiler {
 	extern const char* op_to_string( Operator o );
 	extern size_t precedence( Operator o );
 	extern bool left_to_right( Operator o );
+	extern bool unop( Operator o );
 }

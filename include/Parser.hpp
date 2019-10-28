@@ -43,6 +43,9 @@ namespace Compiler {
 			//TODO
 			AST::Function* parseFunction() noexcept;
 			AST::Stmt* parseStatement() noexcept;
+			AST::Expr* parseBinopExpr() noexcept;
 			AST::Expr* parseExpression() noexcept;
+			AST::Expr* parseOp( AST::Expr* lhs ) noexcept;
+			AST::Expr* parsePreUnop() noexcept;
 	};
 }

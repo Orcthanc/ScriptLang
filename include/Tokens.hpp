@@ -82,7 +82,7 @@ namespace Compiler {
 	//lhs and rhs indicate if there are expressions to the left/right of the op, or if the operator is unary
 	//tok_add, true, true -> op_add
 	//tok_add, false, true -> op_plus
-	extern const Operator tok_to_op( Token t, bool lhs, bool rhs );
+	extern const Operator tok_to_op( Token t, bool lhs );
 
 	struct Metadata{};
 

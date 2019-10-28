@@ -100,3 +100,20 @@ bool Compiler::left_to_right( Operator o ){
 			return false;
 	}
 }
+
+bool Compiler::unop( Operator o ){
+	switch( o ){
+		case op_post_inc:
+		case op_post_dec:
+		case op_call:
+		case op_array:
+		case op_pre_inc:
+		case op_pre_dec:
+		case op_plus:
+		case op_minus:
+		case op_not:
+			return true;
+		default:
+			return false;
+	}
+}

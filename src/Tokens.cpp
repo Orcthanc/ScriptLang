@@ -14,7 +14,7 @@ const char* Compiler::tok_to_string( Token t ){
 	throw std::runtime_error( "Could not convert token to string" );
 }
 
-Operator tok_to_op( Token t, bool lhs ){
+const Operator Compiler::tok_to_op( Token t, bool lhs ){
 	switch( t ){
 		case tok_scope_res:
 			if( lhs )
@@ -203,3 +203,5 @@ Operator tok_to_op( Token t, bool lhs ){
 lerr:
 	return op_error;
 }
+
+
