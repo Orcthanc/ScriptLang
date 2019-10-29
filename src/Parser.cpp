@@ -51,8 +51,6 @@ Expr* Parser::parseExpr() {
 	Expr* ret;
 	ParsedToken tok = tokenizer.curr_tok();
 
-	std::cout << tok_to_string( tok.token ) << std::endl;
-
 	switch( tok.token ){
 		case tok_str_lit:
 			ret = new String( std::static_pointer_cast<MetadataString>( tok.metadata )->string );
@@ -94,10 +92,20 @@ Expr* Parser::parseExpr() {
 
 Expr* Parser::parseOp( Expr* lhs ) {
 	//TODO
-	std::cout << op_to_string( tok_to_op( tokenizer.curr_tok().token, true )) << std::endl;
+	//std::cout << op_to_string( tok_to_op( tokenizer.curr_tok().token, true )) << std::endl;
 	Token temp = tokenizer.curr_tok().token;
 	if( unop( tok_to_op( temp, true ))){
 		tokenizer.next_tok();
+		switch( tok_to_op( temp, true )){
+			case op_post_inc:
+				lhs = new PostInc( std::unique_ptr<Expr>( lhs ));
+				break;
+			case op_post_dec:
+				lhs = new PostDec( std::unique_ptr<Expr>( lhs ));
+				break;
+			default:
+				std::cout << "Invalid post-unop \"" << tok_to_op( tokenizer.curr_tok().token, false ) << "\"";
+		}
 		if( tokenizer.curr_tok().token == tok_semicolon )
 			return lhs;
 		return parseOp( lhs );
@@ -122,7 +130,7 @@ Expr* Parser::parsePreUnop() {
 		case op_not:
 			return new Not( std::unique_ptr<Expr>( parseExpr()));
 		default:
-			std::cout << "Invalid unop \"" << tok_to_op( tokenizer.curr_tok().token, false ) << "\"";
+			std::cout << "Invalid pre-unop \"" << tok_to_op( tokenizer.curr_tok().token, false ) << "\"";
 	}
 	return nullptr;
 }
