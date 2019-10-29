@@ -71,6 +71,82 @@ size_t Compiler::precedence( Operator o ){
 	return -1;
 }
 
+const char* Compiler::op_to_symbol( Operator o ){
+	switch( o ){
+		case op_scope_res:
+			return "::";
+		case op_post_inc:
+		case op_pre_inc:
+			return "++";
+		case op_post_dec:
+		case op_pre_dec:
+			return "--";
+		case op_call:
+			return "()";
+		case op_array:
+			return "[]";
+		case op_member:
+			return ".";
+		case op_plus:
+		case op_add:
+			return "+";
+		case op_minus:
+		case op_sub:
+			return "-";
+		case op_not:
+			return "~";
+		case op_mul:
+			return "*";
+		case op_div:
+			return "/";
+		case op_mod:
+			return "%";
+		case op_left_shift:
+			return "<<";
+		case op_right_shift:
+			return ">>";
+		case op_lt:
+			return "<";
+		case op_le:
+			return "<=";
+		case op_gt:
+			return ">";
+		case op_ge:
+			return ">=";
+		case op_eq:
+			return "==";
+		case op_ne:
+			return "!=";
+		case op_and:
+			return "&";
+		case op_xor:
+			return "^";
+		case op_ior:
+			return "|";
+		case op_asg:
+			return "=";
+		case op_asg_add:
+			return "+=";
+		case op_asg_sub:
+			return "-=";
+		case op_asg_mul:
+			return "*=";
+		case op_asg_div:
+			return "/=";
+		case op_asg_mod:
+			return "%=";
+		case op_asg_and:
+			return "&=";
+		case op_asg_xor:
+			return "^=";
+		case op_asg_ior:
+			return "=|";
+		case op_error:
+			return "ERROR";
+	}
+	return "ERROR";
+}
+
 bool Compiler::left_to_right( Operator o ){
 	switch( o ){
 		case op_scope_res:

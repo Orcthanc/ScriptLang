@@ -3,35 +3,9 @@
 #include <memory>
 #include <vector>
 
+#include "Operator.hpp"
+
 namespace AST {
-
-#define UNOPS										\
-	UNOP( PostInc );								\
-	UNOP( PostDec );								\
-	UNOP( PreInc );									\
-	UNOP( PreDec );									\
-	UNOP( Plus );									\
-	UNOP( Minus );									\
-	UNOP( Not );
-
-#define BINOPS					\
-	BINOP( Asg )				\
-	BINOP( Add )				\
-	BINOP( Sub )				\
-	BINOP( Mul )				\
-	BINOP( Div )				\
-	BINOP( And )				\
-	BINOP( Xor )				\
-	BINOP( Ior )				\
-								\
-	BINOP( AsgAdd )				\
-	BINOP( AsgSub )				\
-	BINOP( AsgMul )				\
-	BINOP( AsgDiv )				\
-	BINOP( AsgAnd )				\
-	BINOP( AsgXor )				\
-	BINOP( AsgIor )
-
 
 	struct Visitor;
 
@@ -83,37 +57,21 @@ namespace AST {
 
 	struct Binop: public Expr {
 		virtual ~Binop() = default;
-		virtual void accept( Visitor& v ) = 0;
+		virtual void accept( Visitor& v );
 
 		std::unique_ptr<Node> lhs;
 		std::unique_ptr<Node> rhs;
+		Compiler::Operator op;
 	};
-#define BINOP( name )								\
-	struct name: public Binop {						\
-		virtual ~name() = default;					\
-		virtual void accept( Visitor& v );			\
-	};
-	BINOPS
-#undef BINOP
-
 
 	struct Unop: public Expr {
-		Unop( std::unique_ptr<Expr>&& val ): val( move( val )){}
+		Unop( std::unique_ptr<Expr>&& val, Compiler::Operator op ): val( move( val )), op( op ){}
 		virtual ~Unop() = default;
-		virtual void accept( Visitor& v ) = 0;
+		virtual void accept( Visitor& v );
 
 		std::unique_ptr<Expr> val;
+		Compiler::Operator op;
 	};
-
-
-#define UNOP( name )												\
-	struct name: public Unop {										\
-		name( std::unique_ptr<Expr>( val )): Unop( move( val )){}	\
-		virtual ~name() = default;									\
-		virtual void accept( Visitor& v );							\
-	};
-	UNOPS
-#undef UNOP
 
 
 	struct Stmt: public Node {
@@ -144,8 +102,6 @@ namespace AST {
 		ELEMENT( name )
 
 #define ELEMENTS						\
-		UNOPS							\
-		BINOPS							\
 		ELEMENT( Node )					\
 		ELEMENT( OpExpr )				\
 		ELEMENT( Expr )					\
@@ -154,6 +110,7 @@ namespace AST {
 		ELEMENT( String )				\
 		ELEMENT( Boolean )				\
 		ELEMENT( Binop )				\
+		ELEMENT( Unop )					\
 		ELEMENT( Stmt )					\
 		ELEMENT( StmtExprSemicolon )	\
 		ELEMENT( Function )
