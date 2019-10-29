@@ -14,6 +14,25 @@ namespace AST {
 	UNOP( Minus );									\
 	UNOP( Not );
 
+#define BINOPS					\
+	BINOP( Asg )				\
+	BINOP( Add )				\
+	BINOP( Sub )				\
+	BINOP( Mul )				\
+	BINOP( Div )				\
+	BINOP( And )				\
+	BINOP( Xor )				\
+	BINOP( Ior )				\
+								\
+	BINOP( AsgAdd )				\
+	BINOP( AsgSub )				\
+	BINOP( AsgMul )				\
+	BINOP( AsgDiv )				\
+	BINOP( AsgAnd )				\
+	BINOP( AsgXor )				\
+	BINOP( AsgIor )
+
+
 	struct Visitor;
 
 	struct Node {
@@ -69,83 +88,29 @@ namespace AST {
 		std::unique_ptr<Node> lhs;
 		std::unique_ptr<Node> rhs;
 	};
-
-	struct Asg: public Binop {
-		virtual ~Asg() = default;
-		virtual void accept( Visitor& v );
+#define BINOP( name )								\
+	struct name: public Binop {						\
+		virtual ~name() = default;					\
+		virtual void accept( Visitor& v );			\
 	};
-
-	struct Add: public Binop {
-		virtual ~Add() = default;
-		virtual void accept( Visitor& v );
-	};
-	struct Sub: public Binop {
-		virtual ~Sub() = default;
-		virtual void accept( Visitor& v );
-	};
-	struct Mul: public Binop {
-		virtual ~Mul() = default;
-		virtual void accept( Visitor& v );
-	};
-	struct Div: public Binop {
-		virtual ~Div() = default;
-		virtual void accept( Visitor& v );
-	};
-	struct And: public Binop {
-		virtual ~And() = default;
-		virtual void accept( Visitor& v );
-	};
-	struct Xor: public Binop {
-		virtual ~Xor() = default;
-		virtual void accept( Visitor& v );
-	};
-	struct Ior: public Binop {
-		virtual ~Ior() = default;
-		virtual void accept( Visitor& v );
-	};
-
-	struct AsgAdd: public Binop {
-		virtual ~AsgAdd() = default;
-		virtual void accept( Visitor& v );
-	};
-	struct AsgSub: public Binop {
-		virtual ~AsgSub() = default;
-		virtual void accept( Visitor& v );
-	};
-	struct AsgMul: public Binop {
-		virtual ~AsgMul() = default;
-		virtual void accept( Visitor& v );
-	};
-	struct AsgDiv: public Binop {
-		virtual ~AsgDiv() = default;
-		virtual void accept( Visitor& v );
-	};
-	struct AsgAnd: public Binop {
-		virtual ~AsgAnd() = default;
-		virtual void accept( Visitor& v );
-	};
-	struct AsgXor: public Binop {
-		virtual ~AsgXor() = default;
-		virtual void accept( Visitor& v );
-	};
-	struct AsgIor: public Binop {
-		virtual ~AsgIor() = default;
-		virtual void accept( Visitor& v );
-	};
+	BINOPS
+#undef BINOP
 
 
 	struct Unop: public Expr {
+		Unop( std::unique_ptr<Expr>&& val ): val( move( val )){}
 		virtual ~Unop() = default;
 		virtual void accept( Visitor& v ) = 0;
 
-		std::unique_ptr<Node> val;
+		std::unique_ptr<Expr> val;
 	};
 
 
-#define UNOP( name )								\
-	struct name: public Unop {						\
-		virtual ~name() = default;					\
-		virtual void accept( Visitor& v );			\
+#define UNOP( name )												\
+	struct name: public Unop {										\
+		name( std::unique_ptr<Expr>( val )): Unop( move( val )){}	\
+		virtual ~name() = default;									\
+		virtual void accept( Visitor& v );							\
 	};
 	UNOPS
 #undef UNOP
@@ -175,9 +140,12 @@ namespace AST {
 	struct Visitor {
 #define UNOP( name )					\
 		ELEMENT( name )
+#define BINOP( name )					\
+		ELEMENT( name )
 
 #define ELEMENTS						\
 		UNOPS							\
+		BINOPS							\
 		ELEMENT( Node )					\
 		ELEMENT( OpExpr )				\
 		ELEMENT( Expr )					\
@@ -186,21 +154,6 @@ namespace AST {
 		ELEMENT( String )				\
 		ELEMENT( Boolean )				\
 		ELEMENT( Binop )				\
-		ELEMENT( Asg )					\
-		ELEMENT( Add )					\
-		ELEMENT( Sub )					\
-		ELEMENT( Mul )					\
-		ELEMENT( Div )					\
-		ELEMENT( And )					\
-		ELEMENT( Xor )					\
-		ELEMENT( Ior )					\
-		ELEMENT( AsgAdd )				\
-		ELEMENT( AsgSub )				\
-		ELEMENT( AsgMul )				\
-		ELEMENT( AsgDiv )				\
-		ELEMENT( AsgAnd )				\
-		ELEMENT( AsgXor )				\
-		ELEMENT( AsgIor )				\
 		ELEMENT( Stmt )					\
 		ELEMENT( StmtExprSemicolon )	\
 		ELEMENT( Function )

@@ -95,7 +95,8 @@ Expr* Parser::parseExpr() {
 Expr* Parser::parseOp( Expr* lhs ) {
 	//TODO
 	std::cout << op_to_string( tok_to_op( tokenizer.curr_tok().token, true )) << std::endl;
-	if( unop( tok_to_op( tokenizer.curr_tok().token, true ))){
+	Token temp = tokenizer.curr_tok().token;
+	if( unop( tok_to_op( temp, true ))){
 		tokenizer.next_tok();
 		if( tokenizer.curr_tok().token == tok_semicolon )
 			return lhs;
@@ -107,16 +108,21 @@ Expr* Parser::parseOp( Expr* lhs ) {
 }
 
 Expr* Parser::parsePreUnop() {
-	//TODO
-	//tokenizer.next_tok();
-	switch( tok_to_op( tokenizer.curr_tok().token, false )){
+	Token temp = tokenizer.curr_tok().token;
+	tokenizer.next_tok();
+	switch( tok_to_op( temp, false )){
 		case op_pre_inc:
+			return new PreInc( std::unique_ptr<Expr>( parseExpr()));
 		case op_pre_dec:
+			return new PreDec( std::unique_ptr<Expr>( parseExpr()));
 		case op_plus:
+			return new Plus( std::unique_ptr<Expr>( parseExpr()));
 		case op_minus:
+			return new Minus( std::unique_ptr<Expr>( parseExpr()));
 		case op_not:
+			return new Not( std::unique_ptr<Expr>( parseExpr()));
 		default:
-			std::cout << "Invalid op \"" << tok_to_op( tokenizer.curr_tok().token, false ) << "\"";
+			std::cout << "Invalid unop \"" << tok_to_op( tokenizer.curr_tok().token, false ) << "\"";
 	}
-	return parseExpr();
+	return nullptr;
 }
