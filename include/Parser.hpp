@@ -44,6 +44,7 @@ namespace Compiler {
 			AST::Function* parseFunc();
 			AST::Stmt* parseStmt();
 			AST::Expr* parseExpr();
+			unsigned short curr_precedence = 0;
 			AST::Expr* parseOp( AST::Expr* lhs );
 			AST::Expr* parsePreUnop();
 	};

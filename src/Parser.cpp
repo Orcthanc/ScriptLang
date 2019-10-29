@@ -38,6 +38,7 @@ Function* Parser::parseFunc(){
 }
 
 Stmt* Parser::parseStmt() {
+	curr_precedence = 12;
 	auto tmp = parseExpr();
 	if( check( tokenizer.curr_tok(), tok_semicolon ))
 		return new StmtExprSemicolon{ std::unique_ptr<Expr>( tmp )};
@@ -68,10 +69,15 @@ Expr* Parser::parseExpr() {
 			ret = new Boolean( false );
 			break;
 		case tok_brak_round_open:
-			tokenizer.next_tok();
-			ret = parseExpr();
-			if( !check( tokenizer.curr_tok(), tok_brak_round_close )){
-				std::cout << "Unexpected token \"" << tok_to_string( tokenizer.curr_tok().token ) << "\" expected \")\"" << std::endl;
+			{
+				unsigned short temp_prec = curr_precedence;
+				curr_precedence = 12;
+				tokenizer.next_tok();
+				ret = parseExpr();
+				if( !check( tokenizer.curr_tok(), tok_brak_round_close )){
+					std::cout << "Unexpected token \"" << tok_to_string( tokenizer.curr_tok().token ) << "\" expected \")\"" << std::endl;
+				}
+				curr_precedence = temp_prec;
 			}
 			break;
 		default:
@@ -82,17 +88,25 @@ Expr* Parser::parseExpr() {
 			return nullptr;
 	}
 
-	if( tok_to_op( tokenizer.next_tok().token, true ) != op_error ){
-		std::cout << "Found op \"" << tok_to_string( tokenizer.curr_tok().token ) << "\" (unimplemented)"  << std::endl;
-		ret = parseOp( ret );
+	tokenizer.next_tok();
+	Operator op;
+	while(( op = tok_to_op( tokenizer.curr_tok().token, true )) != op_error ){
+		std::cout << precedence( op ) << " " << curr_precedence << std::endl;
+		if( precedence( op ) < curr_precedence ){
+			unsigned short temp_prec = curr_precedence;
+			curr_precedence = precedence( op );
+			ret = parseOp( ret );
+			curr_precedence = temp_prec;
+		}
+		else if( precedence( op ) == curr_precedence && !left_to_right( op ))
+			ret = parseOp( ret );
+		else
+			break;
 	}
-
 	return ret;
 }
 
 Expr* Parser::parseOp( Expr* lhs ) {
-	//TODO
-	//std::cout << op_to_string( tok_to_op( tokenizer.curr_tok().token, true )) << std::endl;
 	Token temp = tokenizer.curr_tok().token;
 	Operator op = tok_to_op( temp, true );
 	if( unop( op )){
@@ -102,13 +116,8 @@ Expr* Parser::parseOp( Expr* lhs ) {
 			return lhs;
 		return parseOp( lhs );
 	}
-
-//	switch( op ){
-//	}
-
 	tokenizer.next_tok();
-	delete lhs;
-	return parseExpr();
+	return new Binop( std::unique_ptr<Expr>( lhs ), std::unique_ptr<Expr>( parseExpr()), op );
 }
 
 Expr* Parser::parsePreUnop() {

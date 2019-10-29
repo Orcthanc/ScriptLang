@@ -31,11 +31,14 @@ void PrintVisitor::visit( Boolean* elem ){
 	out << ( elem->value ? "true" : "false" );
 }
 void PrintVisitor::visit( Binop* elem ){
+	out << "( ";
 	elem->lhs->accept( *this );
-	out << Compiler::op_to_symbol( elem->op );
+	out << " " << Compiler::op_to_symbol( elem->op ) << " ";
 	elem->rhs->accept( *this );
+	out << " )";
 }
 void PrintVisitor::visit( Unop* elem ){
+	out << "( ";
 	if( Compiler::left_to_right( elem->op )){
 		elem->val->accept( *this );
 		out << Compiler::op_to_symbol( elem->op );
@@ -43,6 +46,7 @@ void PrintVisitor::visit( Unop* elem ){
 		out << Compiler::op_to_symbol( elem->op );
 		elem->val->accept( *this );
 	}
+	out << " )";
 }
 
 void PrintVisitor::visit( Stmt* elem ){

@@ -56,6 +56,7 @@ namespace AST {
 	};
 
 	struct Binop: public Expr {
+		Binop( std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs, Compiler::Operator op ): lhs( std::move( lhs )), rhs( std::move( rhs )), op( op ){}
 		virtual ~Binop() = default;
 		virtual void accept( Visitor& v );
 
