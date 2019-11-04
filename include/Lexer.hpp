@@ -27,5 +27,6 @@ namespace Compiler {
 			char* history;
 			unsigned hist_len;
 			char read;
+			unsigned int line = 1;
 	};
 }

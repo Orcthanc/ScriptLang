@@ -21,14 +21,13 @@ Function* Parser::parseFunc(){
 	Function* node = new Function;
 	// {
 	if( !check( tokenizer.next_tok(), tok_brak_curly_open )){
-		std::cout << "Unexpected token \"" << tok_to_string( tokenizer.curr_tok().token ) << "\" expected \"{\"" << std::endl;
+		unexpected_tok( tokenizer.curr_tok(), "\"{\"" );
 		return nullptr;
 	}
 
 	while( !check( tokenizer.next_tok(), tok_brak_curly_close )){
 		Stmt* stmt = parseStmt();
 		if( stmt == nullptr ){
-			std::cout << "Unexpected token \"" << tok_to_string( tokenizer.curr_tok().token ) << "\"" << std::endl;
 			return nullptr;
 		}
 		node->stmts.emplace_back( stmt );
@@ -38,12 +37,14 @@ Function* Parser::parseFunc(){
 }
 
 Stmt* Parser::parseStmt() {
+	
 	curr_precedence = 12;
 	auto tmp = parseExpr();
+	std::cout << "  stmtend" << std::endl;
 	if( check( tokenizer.curr_tok(), tok_semicolon ))
 		return new StmtExprSemicolon{ std::unique_ptr<Expr>( tmp )};
 	else {
-		std::cout << "Unexpected token \"" << tok_to_string( tokenizer.curr_tok().token ) << "\" expected \";\"" << std::endl;
+		unexpected_tok( tokenizer.curr_tok(), "\";\"" );
 		return nullptr;
 	}
 }
@@ -51,6 +52,8 @@ Stmt* Parser::parseStmt() {
 Expr* Parser::parseExpr() {
 	Expr* ret;
 	ParsedToken tok = tokenizer.curr_tok();
+
+	std::cout << "    " << tok_to_string( tok.token ) << std::endl;
 
 	switch( tok.token ){
 		case tok_str_lit:
@@ -75,20 +78,24 @@ Expr* Parser::parseExpr() {
 				tokenizer.next_tok();
 				ret = parseExpr();
 				if( !check( tokenizer.curr_tok(), tok_brak_round_close )){
-					std::cout << "Unexpected token \"" << tok_to_string( tokenizer.curr_tok().token ) << "\" expected \")\"" << std::endl;
+					unexpected_tok( tokenizer.curr_tok(), "\")\"" );
 				}
 				curr_precedence = temp_prec;
 			}
 			break;
 		default:
 			if( tok_to_op( tok.token, false ) != op_error ){
-				return parsePreUnop();
+				ret = parsePreUnop();
+				goto LPreUnop;
 			}
 			std::cout << "asdf " << tok_to_string( tok.token ) << std::endl;
 			return nullptr;
 	}
 
+	std::cout << tok_to_string( tokenizer.peek_tok().token ) << std::endl;
 	tokenizer.next_tok();
+	//Every path exept default needs the next_tok call
+LPreUnop:
 	Operator op;
 	while(( op = tok_to_op( tokenizer.curr_tok().token, true )) != op_error ){
 		std::cout << precedence( op ) << " " << curr_precedence << std::endl;
@@ -103,6 +110,7 @@ Expr* Parser::parseExpr() {
 		else
 			break;
 	}
+
 	return ret;
 }
 
@@ -123,5 +131,13 @@ Expr* Parser::parseOp( Expr* lhs ) {
 Expr* Parser::parsePreUnop() {
 	Token temp = tokenizer.curr_tok().token;
 	tokenizer.next_tok();
-	return new Unop( std::unique_ptr<Expr>( parseExpr()), tok_to_op( temp, false ));
+	unsigned short temp_prec = curr_precedence;
+	curr_precedence = precedence( tok_to_op( temp, false ));
+	Expr* ex = new Unop( std::unique_ptr<Expr>( parseExpr()), tok_to_op( temp, false ));
+	curr_precedence = temp_prec;
+
+	std::cout << "a " << tok_to_string( tokenizer.curr_tok().token ) << std::endl;
+
+	return ex;
+
 }

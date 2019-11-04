@@ -99,10 +99,17 @@ namespace Compiler {
 	};
 
 	struct ParsedToken {
-		ParsedToken( Token tok, std::unique_ptr<Metadata>&& metadata ): token( tok ), metadata( std::move( metadata )){}
-		ParsedToken( Token tok ): token( tok ), metadata( nullptr ){}
+		ParsedToken( Token tok, std::unique_ptr<Metadata>&& metadata, const std::string file, unsigned line_number ): token( tok ), metadata( std::move( metadata )), file( file ), line_number( line_number ){}
+		ParsedToken( Token tok, const std::string file, unsigned line_number ): token( tok ), metadata( nullptr ), file( file ), line_number( line_number ){}
+		ParsedToken( const ParsedToken& ) = default;
+		ParsedToken( ParsedToken&& ) = default;
+
+		ParsedToken& operator=( const ParsedToken& ) = default;
+		ParsedToken& operator=( ParsedToken&& ) = default;
 
 		Token token;
 		std::shared_ptr<Metadata> metadata;
+		std::string file;
+		unsigned line_number;
 	};
 }

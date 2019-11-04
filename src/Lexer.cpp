@@ -6,7 +6,7 @@
 
 using namespace Compiler;
 
-Tokenizer::Tokenizer( std::ifstream&& file ): current_tok( tok_error ), future_tok( tok_error ), file( std::move( file )){
+Tokenizer::Tokenizer( std::ifstream&& file ): current_tok( tok_error, "", 0 ), future_tok( tok_error, "", 0 ), file( std::move( file )){
 	history = (char*)malloc( 16 );
 	hist_len = 16;
 	do {
@@ -48,158 +48,171 @@ ParsedToken Tokenizer::curr_tok(){
 }
 
 void Tokenizer::calc_next_tok(){
+
 	if( future_tok.token == tok_eof ){
-		current_tok = tok_eof;
+		current_tok = { tok_eof, "", line };
 		return;
 	}
 
-	while( isspace( read ))
+
+	while( isspace( read )){
+		if( read == '\n' )
+			++line;
 		read = file.get();
+	}
 
 	current_tok = std::move( future_tok );
 
+#ifndef CRTOKEN
+#define CRTOKEN( tok ) { tok, "", line }
+#endif
+
+#ifndef CRMTOKEN
+#define CRMTOKEN( tok, m ) { tok, m, "", line }
+#endif
+
 	switch( read ){
 		case EOF:
-			future_tok = { tok_eof, nullptr };
+			future_tok = CRTOKEN( tok_eof );
 			break;
 		case '+':
 			if( file.peek() == '=' ){
 				file.get();
-				future_tok = tok_asg_add;
+				future_tok = CRTOKEN( tok_asg_add );
 				break;
 			} else if( file.peek() == '+' ){
 				file.get();
-				future_tok = tok_inc;
+				future_tok = CRTOKEN( tok_inc );
 				break;
 			}
-			future_tok = tok_add;
+			future_tok = CRTOKEN( tok_add );
 			break;
 		case '-':
 			if( file.peek() == '=' ){
 				file.get();
-				future_tok = tok_asg_sub;
+				future_tok = CRTOKEN( tok_asg_sub );
 				break;
 			} else if( file.peek() == '-' ){
 				file.get();
-				future_tok = tok_dec;
+				future_tok = CRTOKEN( tok_dec );
 				break;
 			}
-			future_tok = tok_sub;
+			future_tok = CRTOKEN( tok_sub );
 			break;
 		case '*':
 			if( file.peek() == '=' ){
 				file.get();
-				future_tok = tok_asg_mul;
+				future_tok = CRTOKEN( tok_asg_mul );
 				break;
 			}
-			future_tok = tok_mul;
+			future_tok = CRTOKEN( tok_mul );
 			break;
 		case '/':
 			if( file.peek() == '=' ){
 				file.get();
-				future_tok = tok_asg_div;
+				future_tok = CRTOKEN( tok_asg_div );
 				break;
 			}
-			future_tok = tok_div;
+			future_tok = CRTOKEN( tok_div );
 			break;
 		case '%':
 			if( file.peek() == '=' ){
 				file.get();
-				future_tok = tok_asg_mod;
+				future_tok = CRTOKEN( tok_asg_mod );
 				break;
 			}
-			future_tok = tok_mod;
+			future_tok = CRTOKEN( tok_mod );
 			break;
 		case '&':
 			if( file.peek() == '=' ){
 				file.get();
-				future_tok = tok_asg_and;
+				future_tok = CRTOKEN( tok_asg_and );
 				break;
 			}
-			future_tok = tok_and;
+			future_tok = CRTOKEN( tok_and );
 			break;
 		case '^':
 			if( file.peek() == '=' ){
 				file.get();
-				future_tok = tok_asg_xor;
+				future_tok = CRTOKEN( tok_asg_xor );
 				break;
 			}
-			future_tok = tok_xor;
+			future_tok = CRTOKEN( tok_xor );
 			break;
 		case '|':
 			if( file.peek() == '=' ){
 				file.get();
-				future_tok = tok_asg_ior;
+				future_tok = CRTOKEN( tok_asg_ior );
 				break;
 			}
-			future_tok = tok_ior;
+			future_tok = CRTOKEN( tok_ior );
 			break;
 		case '~':
-			future_tok = tok_not;
+			future_tok = CRTOKEN( tok_not );
 			break;
 		case '!':
 			if( file.peek() == '=' ){
 				file.get();
-				future_tok = tok_ne;
+				future_tok = CRTOKEN( tok_ne );
 				break;
 			}
-			future_tok = tok_logic_not;
+			future_tok = CRTOKEN( tok_logic_not );
 			break;
 		case '=':
 			if( file.peek() == '=' ){
 				file.get();
-				future_tok = tok_eq;
+				future_tok = CRTOKEN( tok_eq );
 				break;
 			}
-			future_tok = tok_asg;
+			future_tok = CRTOKEN( tok_asg );
 			break;
 		case '(':
-			future_tok = tok_brak_round_open;
+			future_tok = CRTOKEN( tok_brak_round_open );
 			break;
 		case ')':
-			future_tok = tok_brak_round_close;
+			future_tok = CRTOKEN( tok_brak_round_close );
 			break;
 		case '[':
-			future_tok = tok_brak_square_open;
+			future_tok = CRTOKEN( tok_brak_square_open );
 			break;
 		case ']':
-			future_tok = tok_brak_square_close;
+			future_tok = CRTOKEN( tok_brak_square_close );
 			break;
 		case '{':
-			future_tok = tok_brak_curly_open;
+			future_tok = CRTOKEN( tok_brak_curly_open );
 			break;
 		case '}':
-			future_tok = tok_brak_curly_close;
+			future_tok = CRTOKEN( tok_brak_curly_close );
 			break;
 		case ';':
-			future_tok = tok_semicolon;
+			future_tok = CRTOKEN( tok_semicolon );
 			break;
 		case '.':
-			future_tok = tok_dot;
+			future_tok = CRTOKEN( tok_dot );
 			break;
 		case '<':
 			if( file.peek() == '<' ){
 				file.get();
-				future_tok = tok_left_shift;
+				future_tok = CRTOKEN( tok_left_shift );
 				break;
 			} else if( file.peek() == '=' ){
 				file.get();
-				future_tok = tok_le;
+				future_tok = CRTOKEN( tok_le );
 				break;
 			}
-			future_tok = tok_lt;
+			future_tok = CRTOKEN( tok_lt );
 			break;
 		case '>':
 			if( file.peek() == '>' ){
 				file.get();
-				future_tok = tok_right_shift;
+				future_tok = CRTOKEN( tok_right_shift );
 				break;
 			} else if( file.peek() == '=' ){
 				file.get();
-				future_tok = tok_ge;
+				future_tok = CRTOKEN( tok_ge );
 				break;
 			}
-			future_tok = tok_gt;
+			future_tok = CRTOKEN( tok_gt );
 			break;
 		case '"':
 		{
@@ -221,7 +234,7 @@ void Tokenizer::calc_next_tok(){
 			} while( read != '"' );
 			history[i] = '\0';
 
-			future_tok = { tok_str_lit, std::unique_ptr<Metadata>( new MetadataString( history ))};
+			future_tok = CRMTOKEN( tok_str_lit, std::unique_ptr<Metadata>( new MetadataString( history )));
 			break;
 
 		}
@@ -241,7 +254,7 @@ void Tokenizer::calc_next_tok(){
 				} while( isdigit( read ) || read == '.' );
 				history[i] = '\0';
 				double val = strtod( history, nullptr );
-				future_tok = { tok_num_lit, std::unique_ptr<Metadata>( new MetadataNum( val ))};
+				future_tok = CRMTOKEN( tok_num_lit, std::unique_ptr<Metadata>( new MetadataNum( val )));
 				return;
 			}
 			else if( isalpha( read )){
@@ -259,7 +272,7 @@ void Tokenizer::calc_next_tok(){
 				} while( isalnum( read ));
 				history[i] = '\0';
 
-#define KEYWORD( k ) if( !strcmp( history, #k )) { future_tok = { tok_##k, nullptr }; return; }
+#define KEYWORD( k ) if( !strcmp( history, #k )) { future_tok = CRTOKEN( tok_##k ); return; }
 				KEYWORD( true )
 				KEYWORD( false )
 				KEYWORD( for )
@@ -267,14 +280,17 @@ void Tokenizer::calc_next_tok(){
 				KEYWORD( null )
 #undef KEYWORD
 
-				future_tok = { tok_id, std::unique_ptr<Metadata>( new MetadataString( history ))};
+				future_tok = CRMTOKEN( tok_id, std::unique_ptr<Metadata>( new MetadataString( history )));
 				return;
 			}
-			future_tok = tok_error;
+			future_tok = CRTOKEN( tok_error );
 			break;
 	}
 	read = file.get();
 
-	while( isspace( read ))
-		read = file.get();
+#undef CRTOKEN
+#undef CRMTOKEN
+
+	//while( isspace( read ))
+	//	read = file.get();
 }
