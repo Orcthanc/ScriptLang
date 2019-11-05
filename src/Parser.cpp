@@ -68,6 +68,7 @@ Expr* Parser::parseExpr() {
 					unexpected_tok( tokenizer.curr_tok(), "\")\"" );
 				}
 				ret = new CallOp( std::unique_ptr<Identifier>( id ), std::unique_ptr<Expr>( args ), op_call );
+				tokenizer.next_tok();
 			} else if( tokenizer.curr_tok() == tok_brak_square_open ){
 				tokenizer.next_tok();
 				Identifier* id = dynamic_cast<Identifier*>( ret );
@@ -76,6 +77,7 @@ Expr* Parser::parseExpr() {
 					unexpected_tok( tokenizer.curr_tok(), "\"]\"" );
 				}
 				ret = new CallOp( std::unique_ptr<Identifier>( id ), std::unique_ptr<Expr>( args ), op_array );
+				tokenizer.next_tok();
 			}
 			break;
 		case tok_num_lit:
