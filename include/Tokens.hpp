@@ -110,6 +110,8 @@ namespace Compiler {
 		ParsedToken& operator=( const ParsedToken& ) = default;
 		ParsedToken& operator=( ParsedToken&& ) = default;
 
+		bool operator==( const Token& );
+
 		Token token;
 		std::shared_ptr<Metadata> metadata;
 		std::string file;

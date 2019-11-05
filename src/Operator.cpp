@@ -64,6 +64,8 @@ size_t Compiler::precedence( Operator o ){
 		case op_asg_xor:
 		case op_asg_ior:
 			return 11;
+		case op_comma:
+			return 12;
 		case op_error:
 			return -1;
 			//No default to get warnings if a op gets added
@@ -141,6 +143,8 @@ const char* Compiler::op_to_symbol( Operator o ){
 			return "^=";
 		case op_asg_ior:
 			return "=|";
+		case op_comma:
+			return ",";
 		case op_error:
 			return "ERROR";
 	}
@@ -171,6 +175,7 @@ bool Compiler::left_to_right( Operator o ){
 		case op_and:
 		case op_xor:
 		case op_ior:
+		case op_comma:
 			return true;
 		default:
 			return false;

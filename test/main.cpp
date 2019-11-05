@@ -3,6 +3,7 @@
 #include "Lexer.hpp"
 #include "PrintVisitor.hpp"
 #include "Parser.hpp"
+#include "Operator.hpp"
 
 using namespace Compiler;
 
@@ -30,8 +31,6 @@ int main( int argc, char** argv ){
 		}
 	}
 #else
-
-	std::cout << std::endl << std::endl;
 
 	Parser pars( std::move( tokenizer ));
 

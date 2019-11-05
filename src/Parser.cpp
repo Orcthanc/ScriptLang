@@ -38,7 +38,7 @@ Function* Parser::parseFunc(){
 
 Stmt* Parser::parseStmt() {
 	
-	curr_precedence = 12;
+	curr_precedence = 13;
 	auto tmp = parseExpr();
 	if( check( tokenizer.curr_tok(), tok_semicolon ))
 		return new StmtExprSemicolon{ std::unique_ptr<Expr>( tmp )};
@@ -55,42 +55,63 @@ Expr* Parser::parseExpr() {
 	switch( tok.token ){
 		case tok_str_lit:
 			ret = new String( std::static_pointer_cast<MetadataString>( tok.metadata )->string );
+			tokenizer.next_tok();
 			break;
 		case tok_id:
 			ret = new Identifier( std::static_pointer_cast<MetadataString>( tok.metadata )->string );
+			tokenizer.next_tok();
+			if( tokenizer.curr_tok() == tok_brak_round_open ){
+				tokenizer.next_tok();
+				Identifier* id = dynamic_cast<Identifier*>( ret );
+				Expr* args = parseExpr();
+				if( !check( tokenizer.curr_tok(), tok_brak_round_close )){
+					unexpected_tok( tokenizer.curr_tok(), "\")\"" );
+				}
+				ret = new CallOp( std::unique_ptr<Identifier>( id ), std::unique_ptr<Expr>( args ), op_call );
+			} else if( tokenizer.curr_tok() == tok_brak_square_open ){
+				tokenizer.next_tok();
+				Identifier* id = dynamic_cast<Identifier*>( ret );
+				Expr* args = parseExpr();
+				if( !check( tokenizer.curr_tok(), tok_brak_square_close )){
+					unexpected_tok( tokenizer.curr_tok(), "\"]\"" );
+				}
+				ret = new CallOp( std::unique_ptr<Identifier>( id ), std::unique_ptr<Expr>( args ), op_array );
+			}
 			break;
 		case tok_num_lit:
 			ret = new Number( std::static_pointer_cast<MetadataNum>( tok.metadata )->number );
+			tokenizer.next_tok();
 			break;
 		case tok_true:
 			ret = new Boolean( true );
+			tokenizer.next_tok();
 			break;
 		case tok_false:
 			ret = new Boolean( false );
+			tokenizer.next_tok();
 			break;
 		case tok_brak_round_open:
 			{
 				unsigned short temp_prec = curr_precedence;
-				curr_precedence = 12;
+				curr_precedence = 13;
 				tokenizer.next_tok();
 				ret = parseExpr();
 				if( !check( tokenizer.curr_tok(), tok_brak_round_close )){
 					unexpected_tok( tokenizer.curr_tok(), "\")\"" );
 				}
 				curr_precedence = temp_prec;
+				tokenizer.next_tok();
 			}
 			break;
 		default:
 			if( tok_to_op( tok.token, false ) != op_error ){
 				ret = parsePreUnop();
-				goto LPreUnop;
+				break;
 			}
 			return nullptr;
 	}
 
-	tokenizer.next_tok();
 	//Every path exept default needs the next_tok call
-LPreUnop:
 	Operator op;
 	while(( op = tok_to_op( tokenizer.curr_tok().token, true )) != op_error ){
 		if( precedence( op ) < curr_precedence ){

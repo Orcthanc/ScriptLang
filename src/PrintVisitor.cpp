@@ -37,6 +37,31 @@ void PrintVisitor::visit( Binop* elem ){
 	elem->rhs->accept( *this );
 	out << " )";
 }
+void PrintVisitor::visit( CallOp* elem ){
+	elem->id->accept( *this );
+	switch( elem->op ){
+		case Compiler::op_call:
+			out << "( ";
+			break;
+		case Compiler::op_array:
+			out << "[ ";
+			break;
+		default:
+			throw std::runtime_error( std::string( "Invalid op in syntaxtree " ) + op_to_symbol( elem->op ));
+	}
+	elem->args->accept( *this );
+	switch( elem->op ){
+		case Compiler::op_call:
+			out << " )";
+			break;
+		case Compiler::op_array:
+			out << " ]";
+			break;
+		default:
+			throw std::runtime_error( std::string( "Invalid op in syntaxtree " ) + op_to_symbol( elem->op ));
+	}
+
+}
 void PrintVisitor::visit( Unop* elem ){
 	out << "( ";
 	if( Compiler::left_to_right( elem->op )){

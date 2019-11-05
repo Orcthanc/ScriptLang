@@ -48,7 +48,9 @@ namespace Compiler {
 	OPERATOR( op_asg_mod )					/* %= */	\
 	OPERATOR( op_asg_and )					/* &= */	\
 	OPERATOR( op_asg_xor )					/* ^= */	\
-	OPERATOR( op_asg_ior )					/* |= */
+	OPERATOR( op_asg_ior )					/* |= */	\
+														\
+	OPERATOR( op_comma )
 
 	enum Operator {
 #define OPERATOR( e ) e,

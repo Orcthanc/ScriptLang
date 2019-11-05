@@ -184,11 +184,15 @@ const Operator Compiler::tok_to_op( Token t, bool lhs ){
 				return op_asg_xor;
 			goto lerr;
 
+		case tok_comma:
+			if( lhs )
+				return op_comma;
+			goto lerr;
+
 		case tok_brak_curly_close:
 		case tok_brak_curly_open:
 		case tok_brak_round_close:
 		case tok_brak_square_close:
-		case tok_comma:
 		case tok_eof:
 		case tok_error:
 		case tok_false:
@@ -211,4 +215,8 @@ lerr:
 
 const Operator Compiler::tok_to_op( ParsedToken t, bool lhs ){
 	return tok_to_op( t.token, lhs );
+}
+
+bool Compiler::ParsedToken::operator==( const Token& t ){
+	return t == token;
 }

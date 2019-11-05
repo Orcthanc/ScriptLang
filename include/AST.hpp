@@ -65,6 +65,16 @@ namespace AST {
 		Compiler::Operator op;
 	};
 
+	struct CallOp: public Expr {
+		CallOp( std::unique_ptr<Identifier> identifier, std::unique_ptr<Expr> args, Compiler::Operator op ): id( std::move( identifier )), args( std::move( args )), op( op ){}
+		virtual ~CallOp() = default;
+		virtual void accept( Visitor& v );
+
+		std::unique_ptr<Identifier> id;
+		std::unique_ptr<Expr> args;
+		Compiler::Operator op;
+	};
+
 	struct Unop: public Expr {
 		Unop( std::unique_ptr<Expr>&& val, Compiler::Operator op ): val( move( val )), op( op ){}
 		virtual ~Unop() = default;
@@ -97,10 +107,6 @@ namespace AST {
 	};
 
 	struct Visitor {
-#define UNOP( name )					\
-		ELEMENT( name )
-#define BINOP( name )					\
-		ELEMENT( name )
 
 #define ELEMENTS						\
 		ELEMENT( Node )					\
@@ -111,6 +117,7 @@ namespace AST {
 		ELEMENT( String )				\
 		ELEMENT( Boolean )				\
 		ELEMENT( Binop )				\
+		ELEMENT( CallOp )				\
 		ELEMENT( Unop )					\
 		ELEMENT( Stmt )					\
 		ELEMENT( StmtExprSemicolon )	\

@@ -75,6 +75,9 @@ void Tokenizer::calc_next_tok(){
 		case EOF:
 			future_tok = CRTOKEN( tok_eof );
 			break;
+		case ',':
+			future_tok = CRTOKEN( tok_comma );
+			break;
 		case '+':
 			if( file.peek() == '=' ){
 				file.get();
