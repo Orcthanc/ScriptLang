@@ -251,7 +251,7 @@ void Tokenizer::calc_next_tok(){
 					}
 					history[i++] = read;
 					read = file.get();
-				} while( isdigit( read ) || read == '.' );
+				} while( isdigit( read ) || read == '.' || read == 'x' || read == 'X' || read == 'e' || read == 'E' );
 				history[i] = '\0';
 				double val = strtod( history, nullptr );
 				future_tok = CRMTOKEN( tok_num_lit, std::unique_ptr<Metadata>( new MetadataNum( val )));

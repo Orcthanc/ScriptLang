@@ -14,6 +14,10 @@ const char* Compiler::tok_to_string( Token t ){
 	throw std::runtime_error( "Could not convert token to string" );
 }
 
+const char* Compiler::tok_to_string( ParsedToken t ){
+	return tok_to_string( t.token );
+}
+
 const Operator Compiler::tok_to_op( Token t, bool lhs ){
 	switch( t ){
 		case tok_scope_res:
@@ -205,3 +209,6 @@ lerr:
 }
 
 
+const Operator Compiler::tok_to_op( ParsedToken t, bool lhs ){
+	return tok_to_op( t.token, lhs );
+}

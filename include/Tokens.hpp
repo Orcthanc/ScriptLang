@@ -71,6 +71,7 @@ namespace Compiler {
 	TOKEN( tok_while )						/* while */					\
 	TOKEN( tok_null )						/* null */
 
+	struct ParsedToken;
 
 #define TOKEN( t ) t,
 	enum Token {
@@ -79,10 +80,12 @@ namespace Compiler {
 #undef TOKEN
 
 	extern const char* tok_to_string( Token t );
+	extern const char* tok_to_string( ParsedToken t );
 	//lhs and rhs indicate if there are expressions to the left/right of the op, or if the operator is unary
 	//tok_add, true, true -> op_add
 	//tok_add, false, true -> op_plus
 	extern const Operator tok_to_op( Token t, bool lhs );
+	extern const Operator tok_to_op( ParsedToken t, bool lhs );
 
 	struct Metadata{};
 
