@@ -21,11 +21,14 @@ namespace Compiler {
 
 		private:
 			void calc_next_tok();
+			void add_char_to_history( char c );
+			void handle_escape_sequence();
 
 			ParsedToken current_tok, future_tok;
 			std::ifstream file;
 			char* history;
 			unsigned hist_len;
+			unsigned hist_i;
 			char read;
 			unsigned int line = 1;
 	};

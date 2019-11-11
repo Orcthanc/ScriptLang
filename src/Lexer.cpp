@@ -220,22 +220,19 @@ void Tokenizer::calc_next_tok(){
 		case '"':
 		{
 			read = file.get();
-			unsigned i = 0;
+			hist_i = 0;
 			do {
-				if( i >= hist_len ){
-					char* temp_history = (char*)malloc( hist_len * 2 );
-					strncpy( temp_history, history, hist_len );
-					free( history );
-					history = temp_history;
-					hist_len *= 2;
+				if( read == '\\' ){
+					handle_escape_sequence();
+				}else {
+					add_char_to_history( read );
 				}
-				history[i++] = read;
 				read = file.get();
 				//TODO \"
 				if( read == EOF )
 					std::cout << "Missing \"" << std::endl;
 			} while( read != '"' );
-			history[i] = '\0';
+			history[hist_i] = '\0';
 
 			future_tok = CRMTOKEN( tok_str_lit, std::unique_ptr<Metadata>( new MetadataString( history )));
 			break;
@@ -243,37 +240,23 @@ void Tokenizer::calc_next_tok(){
 		}
 		default:
 			if( isdigit( read ) || read == '.' ){
-				unsigned i = 0;
+				hist_i = 0;
 				do {
-					if( i >= hist_len ){
-						char* temp_history = (char*)malloc( hist_len * 2 );
-						strncpy( temp_history, history, hist_len );
-						free( history );
-						history = temp_history;
-						hist_len *= 2;
-					}
-					history[i++] = read;
+					add_char_to_history( read );
 					read = file.get();
 				} while( isdigit( read ) || read == '.' || read == 'x' || read == 'X' || read == 'e' || read == 'E' );
-				history[i] = '\0';
+				history[hist_i] = '\0';
 				double val = strtod( history, nullptr );
 				future_tok = CRMTOKEN( tok_num_lit, std::unique_ptr<Metadata>( new MetadataNum( val )));
 				return;
 			}
 			else if( isalpha( read )){
-				unsigned i = 0;
+				hist_i = 0;
 				do {
-					if( i >= hist_len ){
-						char* temp_history = (char*)malloc( hist_len * 2 );
-						strncpy( temp_history, history, hist_len );
-						free( history );
-						history = temp_history;
-						hist_len *= 2;
-					}
-					history[i++] = read;
+					add_char_to_history( read );
 					read = file.get();
 				} while( isalnum( read ));
-				history[i] = '\0';
+				history[hist_i] = '\0';
 
 #define KEYWORD( k ) if( !strcmp( history, #k )) { future_tok = CRTOKEN( tok_##k ); return; }
 				KEYWORD( true )
@@ -293,7 +276,34 @@ void Tokenizer::calc_next_tok(){
 
 #undef CRTOKEN
 #undef CRMTOKEN
+}
 
-	//while( isspace( read ))
-	//	read = file.get();
+void Tokenizer::add_char_to_history( char c ){
+	if( hist_i >= hist_len ){
+		char* temp_history = (char*)malloc( hist_len * 2 );
+		strncpy( temp_history, history, hist_len );
+		free( history );
+		history = temp_history;
+		hist_len *= 2;
+	}
+	history[hist_i++] = c;
+}
+
+void Tokenizer::handle_escape_sequence(){
+	read = file.get();
+
+#define ESC_SEQ( name ) case name: add_char_to_history( name ); break;
+	switch( read ){
+		ESC_SEQ( '\0' );
+		ESC_SEQ( '\a' );
+		ESC_SEQ( '\b' );
+		ESC_SEQ( '\t' );
+		ESC_SEQ( '\n' );
+		ESC_SEQ( '\v' );
+		ESC_SEQ( '\f' );
+		ESC_SEQ( '\r' );
+		ESC_SEQ( '\"' );
+		ESC_SEQ( '\'' );
+		ESC_SEQ( '\\' );
+	}
 }
