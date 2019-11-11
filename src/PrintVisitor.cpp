@@ -81,7 +81,7 @@ void PrintVisitor::visit( StmtExprSemicolon* elem ){
 	elem->expr->accept( *this );
 	out << ";";
 }
-void PrintVisitor::visit( Function* elem ){
+void PrintVisitor::visit( StmtList* elem ){
 	ident( ident_amount++, out );
 	out << "{\n";
 	for( auto& e: elem->stmts ){

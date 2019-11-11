@@ -228,7 +228,6 @@ void Tokenizer::calc_next_tok(){
 					add_char_to_history( read );
 				}
 				read = file.get();
-				//TODO \"
 				if( read == EOF )
 					std::cout << "Missing \"" << std::endl;
 			} while( read != '"' );

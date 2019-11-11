@@ -12,13 +12,13 @@ static bool check( const ParsedToken& tok, Token against ){
 }
 
 std::unique_ptr<Node> Parser::operator()(){
-	return { std::unique_ptr<Node>( parseFunc() )};
+	return { std::unique_ptr<Node>( parseStmtList() )};
 }
 
-Function* Parser::parseFunc(){
+StmtList* Parser::parseStmtList(){
 	//TODO func tok_id( parameters )
 
-	Function* node = new Function;
+	StmtList* node = new StmtList;
 	// {
 	if( !check( tokenizer.next_tok(), tok_brak_curly_open )){
 		unexpected_tok( tokenizer.curr_tok(), "\"{\"" );
@@ -37,7 +37,7 @@ Function* Parser::parseFunc(){
 }
 
 Stmt* Parser::parseStmt() {
-	
+
 	curr_precedence = 13;
 	auto tmp = parseExpr();
 	if( check( tokenizer.curr_tok(), tok_semicolon ))

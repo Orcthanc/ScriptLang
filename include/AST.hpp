@@ -99,8 +99,8 @@ namespace AST {
 		std::unique_ptr<Expr> expr;
 	};
 
-	struct Function: public Node {
-		virtual ~Function() = default;
+	struct StmtList: public Node {
+		virtual ~StmtList() = default;
 		virtual void accept( Visitor& v );
 
 		std::vector<std::unique_ptr<Stmt>> stmts;
@@ -121,7 +121,7 @@ namespace AST {
 		ELEMENT( Unop )					\
 		ELEMENT( Stmt )					\
 		ELEMENT( StmtExprSemicolon )	\
-		ELEMENT( Function )
+		ELEMENT( StmtList )
 #define ELEMENT( e ) virtual void visit( e* ) = 0;
 		ELEMENTS
 #undef ELEMENT

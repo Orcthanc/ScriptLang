@@ -6,20 +6,28 @@
  * 		|	tok_asg_add		//+=
  * 		|	...
  *
+ * 	unop ->
+ * 		|	tok_add			//+
+ * 		|	tok_not			//~
+ * 		|	...
+ *
  *	expr ->
- *		|	tok_str_lit					// "asdf"
- *		|	tok_num_lit					// 1.3
- *		|	tok_identifier				// variablename
- *		|	tok_true					// true
- *		|	tok_false					// false
- *		|	tok_brak_round_open expr tok_brak_round_close		// ( expr )
- *		|	expr binop expr
+ *		|	tok_str_lit																						// "asdf"
+ *		|	tok_num_lit																						// 1.3
+ *		|	tok_id																							// variablename
+ *		|	tok_true																						// true
+ *		|	tok_false																						// false
+ *		|	tok_brak_round_open expr tok_brak_round_close													// ( expr )
+ *		|	expr binop expr																					// 3 * 2
+ *		|	unop expr																						// -12
+ *		|	tok_id tok_brak_(round|square)_open expr? (tok_semicolon expr)* tok_brak_(round|square)_close	// func( 12, "asfd" )
  *
  *	stmt ->
- *		|	expr tok_semicolon			// ;
+ *		|	expr tok_semicolon											// asdf;
+ *		|	tok_brak_curly_open stmt* tok_brak_curly_close				// { asdf; jkl; }
  *
  *	func ->
- *		|	tok_func tok_id tok_brak_round_open ((tok_id tok_comma)*)? tok_brak_round_close tok_brak_curly_open stmt* tok_brak_curly_close				// func name( par1, par2 ){ stmt* }
+ *		|	tok_func tok_id tok_brak_round_open ((tok_id tok_comma)*)? tok_brak_round_close stmt			// func name( par1, par2 ){ stmt* }
  */
 
 #pragma once
@@ -41,7 +49,7 @@ namespace Compiler {
 			//AST::Node parseFileStart();
 			//AST::Node parseNameSpace();
 			//TODO
-			AST::Function* parseFunc();
+			AST::StmtList* parseStmtList();
 			AST::Stmt* parseStmt();
 			AST::Expr* parseExpr();
 			unsigned short curr_precedence = 0;
