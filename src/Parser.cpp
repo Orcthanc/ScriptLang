@@ -12,15 +12,14 @@ static bool check( const ParsedToken& tok, Token against ){
 }
 
 std::unique_ptr<Node> Parser::operator()(){
-	return { std::unique_ptr<Node>( parseStmtList() )};
+	tokenizer.next_tok();
+	return std::unique_ptr<Node>( parseStmtList() );
 }
 
 StmtList* Parser::parseStmtList(){
-	//TODO func tok_id( parameters )
-
 	StmtList* node = new StmtList;
 	// {
-	if( !check( tokenizer.next_tok(), tok_brak_curly_open )){
+	if( !check( tokenizer.curr_tok(), tok_brak_curly_open )){
 		unexpected_tok( tokenizer.curr_tok(), "\"{\"" );
 		return nullptr;
 	}

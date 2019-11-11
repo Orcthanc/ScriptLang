@@ -69,7 +69,10 @@ namespace Compiler {
 	TOKEN( tok_false )						/* false */					\
 	TOKEN( tok_for )						/* for */					\
 	TOKEN( tok_while )						/* while */					\
-	TOKEN( tok_null )						/* null */
+	TOKEN( tok_null )						/* null */					\
+																		\
+	/* Miscellaneous */													\
+	TOKEN( tok_colon )						/* : */
 
 	struct ParsedToken;
 

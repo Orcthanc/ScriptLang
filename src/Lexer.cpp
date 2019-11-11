@@ -169,6 +169,14 @@ void Tokenizer::calc_next_tok(){
 			}
 			future_tok = CRTOKEN( tok_asg );
 			break;
+		case ':':
+			if( file.peek() == ':' ){
+				file.get();
+				future_tok = CRTOKEN( tok_scope_res );
+				break;
+			}
+			future_tok = CRTOKEN( tok_colon );
+			break;
 		case '(':
 			future_tok = CRTOKEN( tok_brak_round_open );
 			break;
