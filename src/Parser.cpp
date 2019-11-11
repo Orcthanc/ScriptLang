@@ -38,6 +38,8 @@ StmtList* Parser::parseStmtList(){
 Stmt* Parser::parseStmt() {
 
 	curr_precedence = 13;
+	if( tokenizer.curr_tok() == tok_brak_curly_open )
+		return parseStmtList();
 	auto tmp = parseExpr();
 	if( check( tokenizer.curr_tok(), tok_semicolon ))
 		return new StmtExprSemicolon{ std::unique_ptr<Expr>( tmp )};

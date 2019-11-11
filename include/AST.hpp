@@ -99,7 +99,7 @@ namespace AST {
 		std::unique_ptr<Expr> expr;
 	};
 
-	struct StmtList: public Node {
+	struct StmtList: public Stmt {
 		virtual ~StmtList() = default;
 		virtual void accept( Visitor& v );
 

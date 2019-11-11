@@ -82,7 +82,7 @@ void PrintVisitor::visit( StmtExprSemicolon* elem ){
 	out << ";";
 }
 void PrintVisitor::visit( StmtList* elem ){
-	ident( ident_amount++, out );
+	ident_amount++;
 	out << "{\n";
 	for( auto& e: elem->stmts ){
 		ident( ident_amount, out );
